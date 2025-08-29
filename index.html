@@ -4876,65 +4876,6 @@
     
 </tbody>
 
-</table>
-
-<!-- Accent-insensitive search plugin + Counter script -->
-
-<script>
-    function normalizeString(str) {
-        return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-    }
-
-    jQuery.fn.DataTable.ext.type.search.string = function ( data ) {
-        return data ? normalizeString(data) : "";
-    };
-
-    $(document).ready(function() {
-
-        // COUNTER SUMMARY CALCULATION — takes API as parameter!
-        function updateStatusSummary(api) {
-            var stillSearching = 0;
-            var infoReceived = 0;
-
-            api.rows({ page: 'all' }).every(function() {
-                var row = this.node();
-                var status = $('td:eq(1)', row).text().trim().toLowerCase();  // case-insensitive!
-
-                if (status === "still searching") {
-                    stillSearching++;
-                } else if (status === "info received") {
-                    infoReceived++;
-                }
-            });
-
-            var total = stillSearching + infoReceived;
-            var percentComplete = total > 0 ? ((infoReceived / total) * 100).toFixed(1) : "0.0";
-
-            $('#statusSummary').html(`
-                🟠 <strong>Still Searching:</strong> ${stillSearching} <br>
-                🟢 <strong>Info Received:</strong> ${infoReceived} <br>
-                📋 <strong>Total Records:</strong> ${total} <br>
-                ✅ <strong>Progress:</strong> ${percentComplete}% complete
-            `);
-        }
-
-        // Initialize DataTable
-        var table = $('#immigrantsTable').DataTable({
-            "pageLength": 50,
-            "order": [[ 0, "asc" ]],
-            "initComplete": function(settings, json) {
-                var api = this.api();  // correct way inside initComplete
-                updateStatusSummary(api);
-            }
-        });
-
-        // Update summary on redraw
-        table.on('draw', function() {
-            updateStatusSummary(table);
-        });
-
-    });
-</script>
 
 </body>
 </html>
